@@ -20,7 +20,6 @@ const initialFormValues = {
     name: '',
     size: '',
     sauce: '',
-    // instructions: ''
   }
   
   const initialDisabled = true;
@@ -33,19 +32,31 @@ export default function Form() {
     const [disabled, setDisabled] = useState(initialDisabled);
     const [pizzas, setPizzas] = useState([]);
     
+    /* checking disabled for submission*/
     useEffect(()=>{
         schema.isValid(formValues).then(valid=>{
           setDisabled(!valid)
         });
       }, [formValues])
 
-    useEffect(()=>{
-        axios.get('https://reqres.in/')
-        .then(res=>{
-            console.log(res)
+
+      /*changing values/setting form values on change of input and checking for/updating form errors */
+      const onChange = e => {
+        const {name, value, checked, type} = e.target;
+        const newValue = type === 'checkbox' ? checked : value;
+        change(name, newValue);
+    }
+
+    const change = (name, value) => {
+        if (name==='name' || name==='size'||name==='sauce') {
+        validate(name, value);
+        }
+        setFormValues({
+          ...formValues,
+          [name]: value
         })
-    }, [])
-    
+      }
+
     const validate = (name, value) => {
         console.log(name);
         console.log(value)
@@ -61,28 +72,10 @@ export default function Form() {
           ...formErrors, [name]: err.errors[0]
         })
       })
-    }
+    } 
 
-    
- 
-
-
-
-    const onChange = e => {
-        const {name, value, checked, type} = e.target;
-        const newValue = type === 'checkbox' ? checked : value;
-        change(name, newValue);
-    }
-
-    const change = (name, value) => {
-        validate(name, value);
-        setFormValues({
-          ...formValues,
-          [name]: value
-        })
-      }
-
-      const onSubmit = e => {
+    /* on submission */
+    const onSubmit = e => {
         e.preventDefault();
         submit();
     }
@@ -100,10 +93,10 @@ export default function Form() {
       }
 
       const postPizza = newPizza => {
-        axios.post('https://reqres.in/', {newPizza})
+        axios.post('https://reqres.in/api/pizza', newPizza)
         .then(res=>{
             console.log(res)
-          setPizzas([...pizzas, {...newPizza}]);
+          setPizzas([...pizzas, {...newPizza, id:res.data.id}]);
           setFormValues(initialFormValues);
         })
         .catch(err=>{
@@ -113,6 +106,19 @@ export default function Form() {
 
     return (
         <div>
+            {pizzas.map(pizza=>{
+                    return (
+                        <div>
+                        <h4>***Order Number {pizza.id}***</h4>
+                        <h4>Order for: {pizza.name}</h4>
+                        <h4>Size: {pizza.size}</h4>
+                        <h4>Sauce: {pizza.sauce}</h4>
+                        <h4>Toppings: {pizza.toppings.map(topping=>` ${topping}`)}</h4>
+                        <h4>Special Instructions: {pizza.instructions}</h4>
+                        </div>
+                      
+                    )
+                })}
             <h1>Order Form!</h1>
             <form onSubmit={onSubmit}>
                     <label htmlFor='name'>Enter your name <br></br>
@@ -197,6 +203,7 @@ export default function Form() {
                     </label><br></br>
                     <button disabled={disabled}>Order Now!</button>
             </form>
+            
         </div>
     )
 }
