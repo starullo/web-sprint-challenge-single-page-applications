@@ -5,4 +5,4 @@ export default yup.object().shape({
     size: yup.string().oneOf(['small', 'medium', 'large'], 'You must choose a size'),
     sauce: yup.string().oneOf(['red', 'white', 'bbq'], 'You must choose a sauce'),
 
-}) 
+});
