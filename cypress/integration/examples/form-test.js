@@ -3,7 +3,7 @@ describe('Sams Pizza Page', ()=>{
         cy.visit('http://localhost:3000')
     })
 
-    const link = () => cy.get('a')
+    const link = () => cy.get('a:nth-of-type(2)')
     const name = () => cy.get('input[name=name]');
     const red = () => cy.get('input[value=red]');
     const dropdown = () => cy.get('select');
